@@ -1,0 +1,24 @@
+---
+# code: language=ansible
+- name: create a docker macvlan
+  community.docker.docker_network:
+    name: "{{  cups_macvlan_network_name  }}"
+    driver: macvlan
+    driver_options:
+      subnet: "{{ cups_subnet }}"
+      gateway: "{{ cups_gateway }}"
+      parent: "{{ cups_parent_ethernet_interface | default('eth0') }}"
+    ipam_config:
+      - gateway: "{{ cups_gateway }}"
+        subnet: "{{ cups_subnet }}"
+        iprange: "{{ cups_ip }}/32"
+
+- name: start cups-airprint container
+  community.docker.docker_container:
+    name: cups-airprint
+    image: "drpsychick/airprint-bridge:{{ cups_image_version | default('latest') }}"
+    hostname: "{{ cups_hostname | default( inventory_hostname ) }}"
+    env: "{{ cups_base_environment | combine(cups_additional_environment) }}"
+    networks:
+      - name: "{{  cups_macvlan_network_name  }}"
+        ipv4_address: "{{ cups_ip }}"

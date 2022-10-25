@@ -1,0 +1,29 @@
+---
+# code: language=ansible
+cups_subnet: 192.168.0.0/24
+cups_ip: 192.168.0.100
+cups_gateway: 192.168.0.1
+
+cups_macvlan_network_name: cups_macvlan
+
+cups_additional_environment: {}
+    
+cups_base_environment:
+  CUPS_ADMIN_USER: "{{ cups_admin_user | default('admin') }}"
+  CUPS_ADMIN_PASSWORD: "{{ cups_admin_password | default('secr3t') }}"
+  CUPS_WEBINTERFACE: "{{ cups_webinterface | default('yes') }}"
+  CUPS_SHARE_PRINTERS: "{{ cups_share_printers | default('yes') }}"
+  CUPS_REMOTE_ADMIN: "{{ cups_remote_admin | default('yes') }}" # allow admin from non local source
+  CUPS_ACCESS_LOGLEVEL: "{{ cups_access_loglevel | default('config') }}" # all, access, config, see `man cupsd.conf`
+  CUPS_LOGLEVEL: "{{ cups_loglevel | default('warn') }}" # error, warn, info, debug, debug2 see `man cupsd.conf`
+  CUPS_ENV_DEBUG: "{{ cups_env_debug | default('no') }}" # debug startup script and activate CUPS debug logging
+  CUPS_IP: "{{ cups_ip | default( ansible_host ) }}" # no need to set this usually
+  CUPS_HOSTNAME: "{{ cups_hostname | default( inventory_hostname ) }}" # no need to set this usually -> allows accessing cups via name: https://cups.domain:631/
+  # pass the server cert/key via env in one line each, i.e. CUPS_SSL_CERT: ---- BEGIN CERT ...\none\nline\nseparated\nby\nbackslash\nnewline
+  CUPS_SSL_CERT: "{{ cups_ssl_cert | default('') }}"
+  CUPS_SSL_KEY: "{{ cups_ssl_key | default('') }}"
+  # avahi configuration options
+  AVAHI_INTERFACES: "{{ avahi_interfaces | default('') }}"
+  AVAHI_IPV6: "{{ avahi_ipv6 | default('no') }}"
+  AVAHI_REFLECTOR: "{{ avahi_reflector | default('no') }}"
+  AVAHI_REFLECT_IPV: "{{ avahi_reflect_ipv | default('no') }}"
